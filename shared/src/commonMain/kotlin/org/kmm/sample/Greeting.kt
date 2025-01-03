@@ -17,9 +17,4 @@ class Greeting {
         }
     }
 
-    fun callHttp() {
-
-
-    }
-
 }

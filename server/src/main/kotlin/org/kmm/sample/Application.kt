@@ -8,44 +8,101 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.contentType
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.util.reflect.TypeInfo
-import java.awt.List
-import kotlin.reflect.KClass
+import io.ktor.server.routing.contentType
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
+import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
+import org.kmm.sample.model.ExpenseModel
 
 fun main() {
-    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
+    embeddedServer(
+        Netty,
+        port = SERVER_PORT,
+        host = "0.0.0.0",
+        module = Application::module,
+        watchPaths = listOf("classes", "resources"),
+    )
         .start(wait = true)
 }
 
 fun Application.module() {
 
     install(ContentNegotiation){
-        json()
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        })
     }
 
     install(StatusPages) {
-        exception<Throwable> { cause, type ->
-            cause.respond(HttpStatusCode.InternalServerError, "Something went wrong: ${cause.response.status()?.value}")
+        exception<Throwable> { call, cause ->
+            call.respond(HttpStatusCode.InternalServerError, "Something went wrong: ${cause.message}")
         }
     }
 
 
     routing {
         get("/") {
-            call.respondText("Ktor: ${Greeting().greet()}")
-        }
-        get("/greeting") {
-            call.respondText("Ktor: ${Greeting().greet()}")
+            try {
+                call.respondText("Server Is Up.")
+            }catch (e : Exception){
+                println(e)
+            }
         }
 
-        get("/list") {
+        post("/save"){
 
+            try {
+                println("Content Type - " + call.request.contentType())
+
+                val tempStorage = SingleTon.storageClient
+                val response = call.receive<ExpenseModel>()
+
+                tempStorage.saveExpense(response)
+
+                call.respond(
+                    HttpStatusCode.OK,
+                    tempStorage.fetchData()
+                )
+            }catch (e : Exception) {
+                println(e)
+            }
+        }
+
+        get("/getAllExpense") {
+            val tempStorage = SingleTon.storageClient
             call.respond(
                 HttpStatusCode.OK,
-                message = listOf("One", "Two", "Three", "Four", "Five", "Six")
+                message = tempStorage.fetchData()
             )
+        }
+        get("/findById/{id}") {
+
+            try {
+                val id = call.parameters["id"]?.toInt() ?: 0
+                val tempStorage = SingleTon.storageClient
+
+                if (tempStorage.fetchData().size > id) {
+                    val response = tempStorage.findById(id)
+                    call.respond(
+                        HttpStatusCode.OK,
+                        message = response
+                    )
+                } else {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        message = "Item Not Found."
+                    )
+                }
+            } catch (e : Exception){
+                println(e)
+            }
 
         }
     }
