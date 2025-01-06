@@ -6,6 +6,9 @@ import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.utils.EmptyContent.contentType
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -28,8 +31,9 @@ object NetworkClient {
             install(Logging){
                 level = LogLevel.ALL
             }
+
             headers {
-                append("Content-Type", "application/json")
+                append("Content-Type", ContentType.Application.Json.toString())
 
             }
         }

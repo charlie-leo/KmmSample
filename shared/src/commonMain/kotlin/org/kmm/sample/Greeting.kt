@@ -1,19 +1,34 @@
 package org.kmm.sample
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.kmm.sample.NetworkClient.httpClient
+import org.kmm.sample.model.ExpenseModel
 
-class Greeting {
+class SharedExpenseViewModel {
+
     private val platform = getPlatform()
-
     private val apiService : ApiService = ApiService(httpClient)
 
-    fun greet(): String {
-        return "Hello, ${platform.name}!"
+    private val _expenseList = MutableStateFlow(listOf<ExpenseModel>())
+    val expenseList: StateFlow<List<ExpenseModel>> = _expenseList
+
+
+    suspend fun saveExpense(expenseModel: ExpenseModel){
+        apiService.saveExpense(expenseModel){
+            _expenseList.value = it.toMutableList()
+        }
     }
 
-    suspend fun getList(callback : (value : List<String>) -> Unit) {
-        apiService.getUserList {
-            callback(it)
+    suspend fun fetchAllExpense(){
+        apiService.fetchAllExpense {
+            _expenseList.value = it.toMutableList()
+        }
+    }
+
+    suspend fun findById(id:Int){
+        apiService.findExpenseById(id){
+
         }
     }
 

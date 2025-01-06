@@ -2,7 +2,6 @@ package org.kmm.sample.model
 
 import kotlinx.serialization.Serializable
 
-
 /**
  * Created by Charles Raj I on 30/12/24
  * @project KmmSample
