@@ -2,6 +2,7 @@ package org.kmm.sample.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -19,18 +20,25 @@ class ExpenseViewModel(
 ) : ViewModel()
 {
 
-    val expenseList : StateFlow<List<ExpenseModel>> = sharedExpenseViewModel.expenseList
+//    val expenseList : StateFlow<List<ExpenseModel>> = sharedExpenseViewModel.expenseList
 //    val totalExpenseAmount : StateFlow<String> = flow<String> {  }
+
+    private val _expenseList = MutableStateFlow(listOf<ExpenseModel>())
+    val expenseList: StateFlow<List<ExpenseModel>> get() = _expenseList
 
     init {
         viewModelScope.launch {
-            sharedExpenseViewModel.fetchAllExpense()
+            sharedExpenseViewModel.fetchAllExpense{
+                _expenseList.value = it.toMutableList()
+            }
         }
     }
 
     fun addExpense(expenseModel: ExpenseModel){
         viewModelScope.launch {
-            sharedExpenseViewModel.saveExpense(expenseModel)
+            sharedExpenseViewModel.saveExpense(expenseModel){
+                _expenseList.value = it.toMutableList()
+            }
         }
     }
 

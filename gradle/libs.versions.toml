@@ -17,6 +17,8 @@ kotlin = "2.1.0"
 ktor = "3.0.2"
 logback = "1.5.12"
 kotlinx-version = "1.7.3"
+native-coroutine = "1.0.0-ALPHA-38"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -57,3 +59,5 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+nativecoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "native-coroutine" }
+ksptool = { id = "com.google.devtools.ksp", version.ref = "ksp"}

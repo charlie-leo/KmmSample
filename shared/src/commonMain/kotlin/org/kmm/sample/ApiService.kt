@@ -24,6 +24,7 @@ class ApiService(private val client : HttpClient) {
     private val BASE_URL : String = "http://10.0.2.2:8080"
 
     suspend fun saveExpense(expense : ExpenseModel, callBack: (value: List<ExpenseModel>) -> Unit){
+        println("response : $expense")
         try {
             val response = client.post("$BASE_URL/save"){
 

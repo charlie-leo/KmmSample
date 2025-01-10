@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.nativecoroutines)
+    alias(libs.plugins.ksptool)
 }
 
 kotlin {
@@ -27,7 +29,9 @@ kotlin {
     }
     
     jvm()
-    
+    kotlin.sourceSets.all {
+        languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+    }
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here

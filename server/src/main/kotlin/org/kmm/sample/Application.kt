@@ -65,7 +65,7 @@ fun Application.module() {
                 val response = call.receive<ExpenseModel>()
 
                 tempStorage.saveExpense(response)
-
+                println("Save data : $response")
                 call.respond(
                     HttpStatusCode.OK,
                     tempStorage.fetchData()

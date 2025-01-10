@@ -8,7 +8,8 @@
 
 import Foundation
 import Shared
-
+import Combine
+//import KMPNativeCoroutinesCombine
 
 class ContentViewModel : ObservableObject {
     
@@ -19,23 +20,32 @@ class ContentViewModel : ObservableObject {
     
     init(sharedViewModel: SharedExpenseViewModel) {
         self.sharedViewModel = sharedViewModel
-        expenseList = sharedViewModel.expenseList as! [ExpenseModel]
-       
-//        sharedViewModel.expenseList.observe { [weak self] expenses in
-//            DispatchQueue.main.async {
-//                self?.expenseList = expenses
-//            }
-//        }
         
+         loadExpenses()
     }
     
-//    private func observeExpenseList() {
-//        sharedViewModel.fetchAllExpense.
-//    }
-//    
-//    private func saveExpense(expense : ExpenseModel){
-//        sharedViewModel.saveExpense(expenseModel: expense)
-//    }
+    private func loadExpenses()  {
+        Task{
+            do {
+                try await sharedViewModel.fetchAllExpense { result in
+                    self.expenseList = result
+                }
+            } catch {
+                print("Failed to fetch expenses: \(error)")
+            }
+        }
+    }
     
-    
+    func saveExpense(expense : ExpenseModel){
+        Task {
+            do {
+                print("save request : \(expense)")
+                try await sharedViewModel.saveExpense(expenseModel: expense){ result in
+                    self.expenseList = result
+                }
+            } catch {
+                print("Failed to load expenses: \(error)")
+            }
+        }
+    }
 }
