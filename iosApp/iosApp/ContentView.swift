@@ -23,7 +23,7 @@ struct ContentView: View {
                 List(expenseViewModel.expenseList, id: \.self) { expense in
                     HStack {
                         VStack (alignment: .leading) {
-                            Text(expense.description)
+                            Text(expense.descriptions ?? "")
                                 .font(.headline)
                             
                             Text(expense.type ?? "")
@@ -31,9 +31,11 @@ struct ContentView: View {
                                 .foregroundColor(.gray)
                         }
                         Spacer()
-                        Text(String(format: "$%.2f", expense.amount ?? ""))
-                            .font(.headline)
-                            .fontWeight(.bold)
+                        if let amtExpense = expense.amount{
+                            Text(String(Double(truncating: amtExpense)))
+                                .font(.headline)
+                                .fontWeight(.bold)
+                        }
                     }
                     .padding(.vertical, 5)
                 }
@@ -75,9 +77,19 @@ struct ContentView: View {
                         .padding(.bottom, 10)
                     
                     Button(action : {
-                        expenseViewModel.saveExpense(
-                            expense: ExpenseModel(id: 0, amount: KotlinDouble(pointer: amount) , type: type, descriptions: description)
-                        )
+                        
+                    
+                        if let conAmount = Double(amount) {
+                            let kotlinConAmount = KotlinDouble(value: conAmount)
+                            expenseViewModel.saveExpense(
+                                expense: ExpenseModel(id: 0, amount:  kotlinConAmount, type: type, descriptions: description)
+                            )
+                        } else {
+                            // Failed to convert, handle error
+                            print("Invalid number")
+                        }
+                        
+                       
                     }) {
                         Text("Add")
                             .foregroundColor(.white)

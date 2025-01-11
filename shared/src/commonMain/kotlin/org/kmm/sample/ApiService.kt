@@ -26,7 +26,7 @@ class ApiService(private val client : HttpClient) {
     suspend fun saveExpense(expense : ExpenseModel, callBack: (value: List<ExpenseModel>) -> Unit){
         println("response : $expense")
         try {
-            val response = client.post("$BASE_URL/save"){
+            val response = client.post("${getPlatform().ipAddress}/save"){
 
                 contentType(ContentType.Application.Json)
                 setBody(expense)
